@@ -1,39 +1,118 @@
-﻿using ArtificialNeuralNetwork.AktivationFunktions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ArtificialNeuralNetwork.Layers;
+using ArtificialNeuralNetwork.ActivationFunctions;
+using ArtificialNeuralNetwork.Neurons;
 
 namespace ArtificialNeuralNetwork.Neurons
 {
-    public class Neuron
+    public class Neuron : INeuron
     {
-        public List<Weight> weights = new List<Weight>();
-        private float threshold;
-        private float bias = -0.4f;
-        static Random random = new Random();
-        public IAktivationFunktion aktivationFunktion;
-        public Neuron(IAktivationFunktion aktivationFunktion, int weights, float threshold)
+        #region Constructors
+
+        public Neuron(double bias)
         {
-            for (int i = 0; i < weights; i++)
-            {
-                this.weights.Add(new Weight() { weight = (float)random.Next(0, 101) / (float)100 });
-            }
-            this.aktivationFunktion = aktivationFunktion;
-            this.threshold = threshold;
+            m_bias = new NeuralFactor(bias);
+            m_error = 0;
+            m_input = new Dictionary<INeuronSignal, NeuralFactor>();
         }
-        public float AktivateNeuron(float[,] input)
+
+        #endregion
+
+        #region Member Variables
+
+        private Dictionary<INeuronSignal, NeuralFactor> m_input;
+        double m_output, m_error, m_lastError;
+        NeuralFactor m_bias;
+
+        #endregion
+
+        #region INeuronSignal Members
+
+        public double Output
         {
-            float result = 0;
-            for (int x = 0; x < input.Rank; x++)
-            {
-                for (int i = 0; i < input.GetLength(0); i++)
-                {
-                    result += (weights[x].weight * input[x, i]) + bias;
-                }
-            }
-            return aktivationFunktion.AktivateFunktion(result);
+            get { return m_output; }
+            set { m_output = value; }
         }
+
+        #endregion
+
+        #region INeuronReceptor Members
+
+        public Dictionary<INeuronSignal, NeuralFactor> Input
+        {
+            get { return m_input; }
+        }
+
+        #endregion
+
+        #region INeuron Members
+
+        public void Pulse(INeuralLayer layer)
+        {
+            lock (this)
+            {
+                m_output = 0;
+
+                foreach (KeyValuePair<INeuronSignal, NeuralFactor> item in m_input)
+                    m_output += item.Key.Output * item.Value.Weight;
+
+                m_output += m_bias.Weight;
+
+                m_output = Sigmoid(m_output);
+            }
+        }
+
+        public NeuralFactor Bias
+        {
+            get { return m_bias; }
+            set { m_bias = value; }
+        }
+
+        public double Error
+        {
+            get { return m_error; }
+            set
+            {
+                m_lastError = m_error;
+                m_error = value;
+            }
+        }
+
+        public void ApplyLearning(INeuralLayer layer, ref double learningRate)
+        {
+            foreach (KeyValuePair<INeuronSignal, NeuralFactor> m in m_input)
+                m.Value.ApplyWeightChange(ref learningRate);
+
+            m_bias.ApplyWeightChange(ref learningRate);
+        }
+
+        public void InitializeLearning(INeuralLayer layer)
+        {
+            foreach (KeyValuePair<INeuronSignal, NeuralFactor> m in m_input)
+                m.Value.ResetWeightChange();
+
+            m_bias.ResetWeightChange();
+        }
+
+        public double LastError
+        {
+            get { return m_lastError; }
+            set { m_lastError = value; }
+        }
+
+        #endregion
+
+        #region Private Static Utility Methods
+
+        public static double Sigmoid(double value)
+        {
+            return 1 / (1 + Math.Exp(-value));
+        }
+
+        #endregion
     }
 }

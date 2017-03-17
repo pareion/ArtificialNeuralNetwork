@@ -43,15 +43,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AktivationFunktions\IAktivationFunktion.cs" />
-    <Compile Include="AktivationFunktions\SigmoidFunction.cs" />
-    <Compile Include="Layers\Layer.cs" />
-    <Compile Include="Network\AktivationNetwork.cs" />
-    <Compile Include="Network\Network.cs" />
+    <Compile Include="ActivationFunctions\IActivationFunction.cs" />
+    <Compile Include="ActivationFunctions\SigmoidFunction.cs" />
+    <Compile Include="ActivationFunctions\StepFunction.cs" />
+    <Compile Include="Layers\INeuralLayer.cs" />
+    <Compile Include="Layers\NeuralLayer.cs" />
+    <Compile Include="Network\INeuralNet.cs" />
+    <Compile Include="Network\NeuralNet.cs" />
+    <Compile Include="Neurons\INeuron.cs" />
+    <Compile Include="Neurons\INeuronSignal.cs" />
+    <Compile Include="Neurons\INeuronReceptor.cs" />
     <Compile Include="Neurons\Neuron.cs" />
-    <Compile Include="Neurons\Weight.cs" />
+    <Compile Include="Neurons\NeuronFactor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrainingType\TrainingType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
