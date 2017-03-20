@@ -101,9 +101,9 @@ namespace ArtificialNeuralNetwork.Network
         }
 
         public void Initialize(int randomSeed,
-            int inputNeuronCount, int hiddenNeuronCount, int outputNeuronCount)
+            int inputNeuronCount, int hiddenNeuronCount, int outputNeuronCount, IActivationFunction aktivationFunction)
         {
-            Initialize(this, randomSeed, inputNeuronCount, hiddenNeuronCount, outputNeuronCount);
+            Initialize(this, randomSeed, inputNeuronCount, hiddenNeuronCount, outputNeuronCount, aktivationFunction);
         }
 
         public void PreparePerceptionLayerForPulse(double[] input)
@@ -112,7 +112,7 @@ namespace ArtificialNeuralNetwork.Network
         }
 
         private static void Initialize(NeuralNet net, int randomSeed,
-            int inputNeuronCount, int hiddenNeuronCount, int outputNeuronCount)
+            int inputNeuronCount, int hiddenNeuronCount, int outputNeuronCount, IActivationFunction aktivationFunction)
         {
             int i, j;
             Random rand;
@@ -125,13 +125,13 @@ namespace ArtificialNeuralNetwork.Network
             net.m_hiddenLayer = new NeuralLayer();
 
             for (i = 0; i < inputNeuronCount; i++)
-                net.m_inputLayer.Add(new Neuron(0));
+                net.m_inputLayer.Add(new Neuron(0, aktivationFunction));
 
             for (i = 0; i < outputNeuronCount; i++)
-                net.m_outputLayer.Add(new Neuron(rand.NextDouble()));
+                net.m_outputLayer.Add(new Neuron(rand.NextDouble(), aktivationFunction));
 
             for (i = 0; i < hiddenNeuronCount; i++)
-                net.m_hiddenLayer.Add(new Neuron(rand.NextDouble()));
+                net.m_hiddenLayer.Add(new Neuron(rand.NextDouble(), aktivationFunction));
 
             // wire-up input layer to hidden layer
             for (i = 0; i < net.m_hiddenLayer.Count; i++)

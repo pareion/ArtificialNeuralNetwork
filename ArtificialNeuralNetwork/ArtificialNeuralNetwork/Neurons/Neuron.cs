@@ -13,11 +13,12 @@ namespace ArtificialNeuralNetwork.Neurons
     {
         #region Constructors
 
-        public Neuron(double bias)
+        public Neuron(double bias, IActivationFunction aktivationFunction)
         {
             m_bias = new NeuralFactor(bias);
             m_error = 0;
             m_input = new Dictionary<INeuronSignal, NeuralFactor>();
+            this.aktivationFunction = aktivationFunction;
         }
 
         #endregion
@@ -27,7 +28,7 @@ namespace ArtificialNeuralNetwork.Neurons
         private Dictionary<INeuronSignal, NeuralFactor> m_input;
         double m_output, m_error, m_lastError;
         NeuralFactor m_bias;
-
+        private IActivationFunction aktivationFunction;
         #endregion
 
         #region INeuronSignal Members
@@ -62,7 +63,7 @@ namespace ArtificialNeuralNetwork.Neurons
 
                 m_output += m_bias.Weight;
 
-                m_output = Sigmoid(m_output);
+                m_output = aktivationFunction.ActivateFunction(m_output);
             }
         }
 

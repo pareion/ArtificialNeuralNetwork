@@ -13,24 +13,20 @@ namespace ArtificialNeuralNetwork
 
             NeuralNet net = new NeuralNet();
 
-            net.Initialize(1, 2, 2, 1);
+            net.Initialize(1, 2, 2, 1, new SigmoidFunction());
             double high, mid, low;
-            high = .99;
-            low = .01;
+            high = 1;
+            low = 0;
             mid = .5;
-            bool result, verbose;
+            bool result;
             StringBuilder bld;
-            #region Declarations
 
             double ll, lh, hl, hh;
             int count, iterations;
             double[][] input, output;
+            double input1 = high;
+            double input2 = low;
 
-            #endregion
-
-            #region Initialization
-
-            net = new NeuralNet();
             bld = new StringBuilder();
 
             input = new double[4][];
@@ -45,20 +41,11 @@ namespace ArtificialNeuralNetwork
             output[2] = new double[] { high };
             output[3] = new double[] { low };
 
-            verbose = false;
             count = 0;
             iterations = 5;
 
-            #endregion
-
-            #region Execution
-
-            // initialize with 
-            //   2 perception neurons
-            //   2 hidden layer neurons
-            //   1 output neuron
-            net.Initialize(1, 2, 2, 1);
-
+            //Trains the network x iterations
+            #region training
             do
             {
                 count++;
@@ -94,96 +81,20 @@ namespace ArtificialNeuralNetwork
 
                 hh = net.OutputLayer[0].Output;
 
-                #region verbose
-
-                if (verbose)
-                {
-                    bld.Remove(0, bld.Length);
-
-                    bld.Append("PERCEPTION LAYER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
-                    foreach (Neuron pn in net.PerceptionLayer)
-                        AppendNeuronInfo(bld, pn);
-
-                    bld.Append("\nHIDDEN LAYER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
-                    foreach (Neuron hn in net.HiddenLayer)
-                        AppendNeuronInfo(bld, hn);
-
-                    bld.Append("\nOUTPUT LAYER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
-                    foreach (Neuron on in net.OutputLayer)
-                        AppendNeuronInfo(bld, on);
-
-                    bld.Append("\n");
-
-                    bld.Append("hh: \t").Append(hh.ToString()).Append(" \t< .5\n");
-                    bld.Append("ll: \t").Append(ll.ToString()).Append(" \t< .5\n");
-
-                    bld.Append("hl: \t").Append(hl.ToString()).Append(" \t> .5\n");
-                    bld.Append("lh: \t").Append(lh.ToString()).Append(" \t> .5\n");
-
-                    System.Console.WriteLine(bld.ToString());
-                }
-
-                #endregion
             }
-            // really train this thing well...
             while (hh > (mid + low) / 2
                 || lh < (mid + high) / 2
                 || hl < (mid + low) / 2
                 || ll > (mid + high) / 2);
-
-
-            net.PerceptionLayer[0].Output = low;
-            net.PerceptionLayer[1].Output = low;
-
-            net.Pulse();
-
-            ll = net.OutputLayer[0].Output;
-
-            net.PerceptionLayer[0].Output = high;
-            net.PerceptionLayer[1].Output = low;
-
-            net.Pulse();
-
-            hl = net.OutputLayer[0].Output;
-
-            net.PerceptionLayer[0].Output = low;
-            net.PerceptionLayer[1].Output = high;
-
-            net.Pulse();
-
-            lh = net.OutputLayer[0].Output;
-
-            net.PerceptionLayer[0].Output = high;
-            net.PerceptionLayer[1].Output = high;
-
-            net.Pulse();
-
-            hh = net.OutputLayer[0].Output;
-
-            bld.Remove(0, bld.Length);
-            bld.Append((count * iterations).ToString()).Append(" iterations required for training\n");
-
-            bld.Append("hh: ").Append(hh.ToString()).Append(" < .5\n");
-            bld.Append("ll: ").Append(ll.ToString()).Append(" < .5\n");
-
-            bld.Append("hl: ").Append(hl.ToString()).Append(" > .5\n");
-            bld.Append("lh: ").Append(lh.ToString()).Append(" > .5\n");
-
-            System.Console.WriteLine(bld.ToString());
             #endregion
 
-
-            verbose = false;
-            bld = new StringBuilder();
-
-            net.PerceptionLayer[0].Output = low;
-            net.PerceptionLayer[1].Output = low;
+            net.PerceptionLayer[0].Output = input1;
+            net.PerceptionLayer[1].Output = input2;
             net.Pulse();
             result = net.OutputLayer[0].Output > .5;
 
-
             bld.Remove(0, bld.Length);
-
+            System.Console.WriteLine("Writes all the Neurons in the network ");
             bld.Append("PERCEPTION LAYER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
             foreach (Neuron pn in net.PerceptionLayer)
                 AppendNeuronInfo(bld, pn);
@@ -199,8 +110,8 @@ namespace ArtificialNeuralNetwork
             bld.Append("\n");
 
             System.Console.WriteLine(bld.ToString());
-
-            System.Console.WriteLine(result.ToString());
+            System.Console.WriteLine("Input 1 / 2: " + input1 + " " + input2);
+            System.Console.WriteLine("The actual result: "+ result.ToString());
 
         }
         private static void AppendNeuronInfo(StringBuilder bld, INeuron neuron)
