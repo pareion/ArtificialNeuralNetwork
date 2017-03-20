@@ -8,22 +8,12 @@ namespace MinimalRequirements
 {
     class NeuralNet
     {
-        double learningRate;
-
-        public NeuralNet()
-        {
-            learningRate = 0;
-        }
-        public NeuralNet(double rate)
-        {
-            learningRate = rate;
-        }
-
         public NeuralLayer inputLayer;
         public NeuralLayer hiddenLayer;
         public NeuralLayer outputLayer;
 
         public Random rand = new Random();
+
         public void Pulse()
         {
             hiddenLayer.Pulse(this);
@@ -38,6 +28,7 @@ namespace MinimalRequirements
 
             int i, j;
 
+            //Add neurons to the different layers + bias
             for (i = 0; i < inputNeurons; i++)
                 inputLayer.Add(new Neuron(0));
 
@@ -56,11 +47,11 @@ namespace MinimalRequirements
                     //Set specific weights instead of random for testing
                     if (i == 0)
                     {
-                        hiddenLayer[i].Input.Add(inputLayer.neurons[j], new NeuralFactor(8.4));
+                        hiddenLayer[i].Input.Add(inputLayer.neurons[j], new NeuralFactor(7.5));
                     }
                     else
                     {
-                        hiddenLayer[i].Input.Add(inputLayer.neurons[j], new NeuralFactor(1.6));
+                        hiddenLayer[i].Input.Add(inputLayer.neurons[j], new NeuralFactor(2.5));
                     }
                 }
             }
@@ -76,7 +67,7 @@ namespace MinimalRequirements
                     {
                         outputLayer[i].Input.Add(hiddenLayer.neurons[j], new NeuralFactor(25));
                     }else
-                        outputLayer[i].Input.Add(hiddenLayer.neurons[j], new NeuralFactor(-28));
+                        outputLayer[i].Input.Add(hiddenLayer.neurons[j], new NeuralFactor(-75));
                 }
             }
         }

@@ -5,7 +5,7 @@ namespace MinimalRequirements
 {
     public class Neuron : INeuronReceptor, INeuronSignal
     {
-        public double weight;
+        public double bias;
         public double output;
         private Dictionary<INeuronSignal, NeuralFactor> input = new Dictionary<INeuronSignal, NeuralFactor>();
         public Dictionary<INeuronSignal, NeuralFactor> Input
@@ -29,9 +29,9 @@ namespace MinimalRequirements
             }
         }
 
-        public Neuron(double weight)
+        public Neuron(double bias)
         {
-            this.weight = weight;
+            this.bias = bias;
         }
 
         internal void Pulse(NeuralLayer neuralLayer)
@@ -43,7 +43,7 @@ namespace MinimalRequirements
                 output += item.Key.Output * item.Value.weight;
             }
 
-            output += weight;
+            output += bias;
 
             output = ActivateFunction(output);
         }
