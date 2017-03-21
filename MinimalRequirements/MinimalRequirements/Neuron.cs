@@ -3,31 +3,11 @@ using System.Collections.Generic;
 
 namespace MinimalRequirements
 {
-    public class Neuron : INeuronReceptor, INeuronSignal
+    public class Neuron 
     {
         public double bias;
-        public double output;
-        private Dictionary<INeuronSignal, NeuralFactor> input = new Dictionary<INeuronSignal, NeuralFactor>();
-        public Dictionary<INeuronSignal, NeuralFactor> Input
-        {
-            get
-            {
-                return input;
-            }
-        }
-
-        public double Output
-        {
-            get
-            {
-                return output;
-            }
-
-            set
-            {
-                output = value;
-            }
-        }
+        public double Output;
+        public List<Link> Input = new List<Link>();
 
         public Neuron(double bias)
         {
@@ -36,16 +16,25 @@ namespace MinimalRequirements
 
         internal void Pulse(NeuralLayer neuralLayer)
         {
-            output = 0;
+            Output = 0;
 
             foreach (var item in Input)
             {
-                output += item.Key.Output * item.Value.weight;
+                Output += item.Input.Output * item.Weight;
             }
 
-            output += bias;
+            Output += bias;
 
-            output = ActivateFunction(output);
+            Output = ActivateFunction(Output);
+
+        }
+        public double GetOutput()
+        {
+            return Output;
+        }
+        public void SetOutput(double output)
+        {
+            Output = output;
         }
         public double ActivateFunction(double value)
         {

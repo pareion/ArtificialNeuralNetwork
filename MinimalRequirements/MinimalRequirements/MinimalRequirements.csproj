@@ -43,8 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="INeuronReceptor.cs" />
-    <Compile Include="INeuronSignal.cs" />
+    <Compile Include="Link.cs" />
     <Compile Include="NeuralFactor.cs" />
     <Compile Include="NeuralLayer.cs" />
     <Compile Include="NeuralNet.cs" />

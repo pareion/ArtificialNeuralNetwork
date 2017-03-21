@@ -8,7 +8,6 @@ namespace MinimalRequirements
 {
     class NeuralNet
     {
-
         public NeuralLayer inputLayer;
         public NeuralLayer hiddenLayer;
         public NeuralLayer outputLayer;
@@ -29,14 +28,13 @@ namespace MinimalRequirements
             int i, j;
 
             for (i = 0; i < inputNeurons; i++)
-                inputLayer.Add(new Neuron(0));
+                inputLayer.neurons.Add(new Neuron(0));
 
             for (i = 0; i < hiddenNeurons; i++)
-                hiddenLayer.Add(new Neuron(rand.NextDouble()));
+                hiddenLayer.neurons.Add(new Neuron(rand.NextDouble()));
 
             for (i = 0; i < outputNeurons; i++)
-                outputLayer.Add(new Neuron(rand.NextDouble()));
-
+                outputLayer.neurons.Add(new Neuron(rand.NextDouble()));
 
             //Wire input together with the hidden layer
             for (i = 0; i < hiddenLayer.neurons.Count; i++)
@@ -46,11 +44,12 @@ namespace MinimalRequirements
                     //Set specific weights instead of random for testing
                     if (i == 0)
                     {
-                        hiddenLayer[i].Input.Add(inputLayer.neurons[j], new NeuralFactor(8.4));
+                        Console.WriteLine(inputLayer.neurons[j].GetOutput());
+                        hiddenLayer.neurons[i].Input.Add(new Link(inputLayer.neurons[j], 8.4));
                     }
                     else
                     {
-                        hiddenLayer[i].Input.Add(inputLayer.neurons[j], new NeuralFactor(1.6));
+                        hiddenLayer.neurons[i].Input.Add(new Link(inputLayer.neurons[j], 1.6));
                     }
                 }
             }
@@ -64,9 +63,10 @@ namespace MinimalRequirements
                     //Set specific weights instead of random for testing
                     if (j == 0)
                     {
-                        outputLayer[i].Input.Add(hiddenLayer.neurons[j], new NeuralFactor(25));
-                    }else
-                        outputLayer[i].Input.Add(hiddenLayer.neurons[j], new NeuralFactor(-28));
+                        outputLayer.neurons[i].Input.Add(new Link(hiddenLayer.neurons[j], 25));
+                    }
+                    else
+                        outputLayer.neurons[i].Input.Add(new Link(hiddenLayer.neurons[j], -28));
                 }
             }
         }
