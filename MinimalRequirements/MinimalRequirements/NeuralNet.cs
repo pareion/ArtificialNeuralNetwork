@@ -12,11 +12,14 @@ namespace MinimalRequirements
         public NeuralLayer hiddenLayer;
         public NeuralLayer outputLayer;
 
-        public Random rand = new Random();
+        
         public void Pulse()
         {
-            hiddenLayer.Pulse(this);
-            outputLayer.Pulse(this);
+            lock (this)
+            {
+                hiddenLayer.Pulse(this);
+                outputLayer.Pulse(this);
+            }
         }
 
         public void Init(int inputNeurons, int hiddenNeurons, int outputNeurons)
@@ -24,7 +27,7 @@ namespace MinimalRequirements
             inputLayer = new NeuralLayer();
             hiddenLayer = new NeuralLayer();
             outputLayer = new NeuralLayer();
-
+            Random rand = new Random();
             int i, j;
 
             for (i = 0; i < inputNeurons; i++)
@@ -41,16 +44,7 @@ namespace MinimalRequirements
             {
                 for (j = 0; j < inputLayer.neurons.Count; j++)
                 {
-                    //Set specific weights instead of random for testing
-                    if (i == 0)
-                    {
-                        Console.WriteLine(inputLayer.neurons[j].GetOutput());
-                        hiddenLayer.neurons[i].Input.Add(new Link(inputLayer.neurons[j], 8.4));
-                    }
-                    else
-                    {
-                        hiddenLayer.neurons[i].Input.Add(new Link(inputLayer.neurons[j], 1.6));
-                    }
+                    hiddenLayer.neurons[i].Input.Add(new Link(inputLayer.neurons[j], rand.NextDouble()));
                 }
             }
 
@@ -60,14 +54,137 @@ namespace MinimalRequirements
             {
                 for (j = 0; j < hiddenLayer.neurons.Count; j++)
                 {
-                    //Set specific weights instead of random for testing
-                    if (j == 0)
-                    {
-                        outputLayer.neurons[i].Input.Add(new Link(hiddenLayer.neurons[j], 25));
-                    }
-                    else
-                        outputLayer.neurons[i].Input.Add(new Link(hiddenLayer.neurons[j], -28));
+                    outputLayer.neurons[i].Input.Add(new Link(hiddenLayer.neurons[j], rand.NextDouble()));
                 }
+            }
+        }
+        public void Train(double[][] Input, double[][] ExpectedOutput, double learningrate, int iterations)
+        {
+            lock (this)
+            {
+                for (int i = 0; i < iterations; i++)
+                {
+                    for (int a = 0; a < iterations; a++)
+                    {
+                        InitiateLearning();
+                        for (int b = 0; b < Input.Count(); b++)
+                        {
+                            BackPropogation_TrainingSession(this, Input[b], ExpectedOutput[b], learningrate);
+                        }
+                        ApplyLearning(learningrate);
+                    }
+                }
+            }
+        }
+
+        private void BackPropogation_TrainingSession(NeuralNet neuralNet, double[] input, double[] expected, double learningrate)
+        {
+            PreparePerceptionLayerForPulse(neuralNet, input);
+            neuralNet.Pulse();
+            CalculateErrors(neuralNet, expected);
+            AdjuestNet(neuralNet,learningrate);
+        }
+
+        private void PreparePerceptionLayerForPulse(NeuralNet neuralNet, double[] input)
+        {
+            for (int i = 0; i < inputLayer.neurons.Count; i++)
+            {
+                neuralNet.inputLayer.neurons[i].Output = input[i];
+            }
+        }
+
+        private void InitiateLearning()
+        {
+            lock (this)
+            {
+                hiddenLayer.InitiateLearning();
+                outputLayer.InitiateLearning();
+            }
+        }
+
+        private void ApplyLearning(double learningrate)
+        {
+            lock (this)
+            {
+                hiddenLayer.ApplyLearning(learningrate);
+                outputLayer.ApplyLearning(learningrate);
+            }
+        }
+
+        private void AdjuestNet(NeuralNet neuralNet, double learningrate)
+        {
+            for (int i = 0; i < neuralNet.hiddenLayer.neurons.Count; i++)
+            {
+                Neuron node = neuralNet.hiddenLayer.neurons[i];
+
+                for (int i2 = 0; i2 < neuralNet.outputLayer.neurons.Count; i2++)
+                {
+                    Neuron output = neuralNet.outputLayer.neurons[i2];
+                    output.Input[i].Weight += learningrate * output.error * node.Output;
+                    output.delta += learningrate * output.error * output.weight;
+                }
+            }
+
+            for (int i = 0; i < neuralNet.inputLayer.neurons.Count; i++)
+            {
+                Neuron node = neuralNet.inputLayer.neurons[i];
+
+                for (int i2 = 0; i2 < neuralNet.hiddenLayer.neurons.Count; i2++)
+                {
+                    Neuron output = neuralNet.hiddenLayer.neurons[i2];
+                    output.Input[i].Weight += learningrate * output.error * node.Output;
+                    output.delta += learningrate * output.error * output.weight;
+                }
+            }
+            /*
+            // adjust output layer weight
+            for (int i = 0; i < neuralNet.outputLayer.neurons.Count; i++)
+            {
+                Neuron output = neuralNet.outputLayer.neurons[i];
+                Neuron hidden = null;
+                for (int j = 0; j < neuralNet.hiddenLayer.neurons.Count; j++)
+                {
+                    hidden = neuralNet.hiddenLayer.neurons[i];
+                    output.delta += output.error * hidden.Output;
+                }
+                output.delta += output.error * output.weight;
+            }
+
+            // adjust hidden layer weight
+            for (int i = 0; i < neuralNet.hiddenLayer.neurons.Count; i++)
+            {
+                Neuron hidden = neuralNet.hiddenLayer.neurons[i];
+                Neuron input = null;
+                for (int j = 0; j < neuralNet.inputLayer.neurons.Count; j++)
+                {
+                    input = neuralNet.inputLayer.neurons[i];
+                    hidden.delta += hidden.error * input.Output;
+                }
+                hidden.delta += hidden.error * hidden.weight;
+            }*/
+        }
+
+        private void CalculateErrors(NeuralNet neuralNet, double[] expectedOutput)
+        {
+            //Calculate outputlayer errors
+            for (int i = 0; i < neuralNet.outputLayer.neurons.Count; i++)
+            {
+                double temp = neuralNet.outputLayer.neurons[i].Output;
+                neuralNet.outputLayer.neurons[i].error = (expectedOutput[i] - temp) * temp * (1.0F - temp);
+            }
+
+            //Calculate hiddenlayer errors
+            for (int i = 0; i < neuralNet.hiddenLayer.neurons.Count; i++)
+            {
+                double error = 0;
+                Neuron temp = neuralNet.hiddenLayer.neurons[i];
+                for (int a = 0; a < neuralNet.outputLayer.neurons.Count; a++)
+                {
+                    Neuron outputNode = neuralNet.outputLayer.neurons[a];
+
+                    error += outputNode.error * outputNode.Input[i].Weight * temp.Output * (1.0 - temp.Output);
+                }
+                neuralNet.hiddenLayer.neurons[i].error = error;
             }
         }
     }

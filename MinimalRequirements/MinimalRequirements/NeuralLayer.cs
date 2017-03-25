@@ -16,5 +16,20 @@ namespace MinimalRequirements
             foreach (Neuron n in neurons)
                 n.Pulse(this);
         }
+
+        internal void ApplyLearning(double learningRate)
+        {
+            foreach (var item in neurons)
+            {
+                item.ApplyLearning(this, learningRate);
+            }
+        }
+        internal void InitiateLearning()
+        {
+            foreach (var item in neurons)
+            {
+                item.InitiateLearning(this);
+            }
+        }
     }
 }
