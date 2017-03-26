@@ -22,12 +22,12 @@ namespace MinimalRequirements
             }
         }
 
-        public void Init(int inputNeurons, int hiddenNeurons, int outputNeurons)
+        public void Init(int seed, int inputNeurons, int hiddenNeurons, int outputNeurons)
         {
             inputLayer = new NeuralLayer();
             hiddenLayer = new NeuralLayer();
             outputLayer = new NeuralLayer();
-            Random rand = new Random();
+            Random rand = new Random(seed);
             int i, j;
 
             for (i = 0; i < inputNeurons; i++)
