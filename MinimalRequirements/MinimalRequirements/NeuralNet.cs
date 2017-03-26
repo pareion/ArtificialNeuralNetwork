@@ -123,7 +123,7 @@ namespace MinimalRequirements
                     double momentum = 0;
                     for (int i3 = 0; i3 < expected.Count(); i3++)
                     {
-                        momentum = (expected[i3] - output.Output);
+                        momentum = Math.Abs(expected[i3] - output.Output);
                     }
                     output.Input[i].Weight += momentum * learningrate * output.error * node.Output;
                     output.delta += momentum * learningrate * output.error * output.weight;
@@ -140,7 +140,7 @@ namespace MinimalRequirements
                     double momentum = 0;
                     for (int i3 = 0; i3 < expected.Count(); i3++)
                     {
-                        momentum = (expected[i3] - neuralNet.outputLayer.neurons[i3].Output);
+                        momentum = Math.Abs(expected[i3] - neuralNet.outputLayer.neurons[i3].Output);
                     }
                     output.Input[i].Weight +=  momentum * learningrate * output.error * node.Output;
                     output.delta += momentum * learningrate * output.error * output.weight;
