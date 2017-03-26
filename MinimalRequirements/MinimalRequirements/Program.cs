@@ -1,12 +1,24 @@
 ﻿using System;
+using System.Threading;
 
 namespace MinimalRequirements
 {
     class Program
     {
+        NeuralNet net = new NeuralNet();
         static void Main(string[] args)
         {
-            NeuralNet net = new NeuralNet();
+
+            Program p = new Program();
+            p.Run();
+        }
+        private void Run()
+        {
+            double ll, lh, hl, hh;
+            double high, mid, low;
+            high = 0.99;
+            low = 0.01;
+            mid = .5;
 
             net.Init(2, 2, 1);
             double[][] input = new double[4][];
@@ -20,38 +32,62 @@ namespace MinimalRequirements
             output[1] = new double[] { 0.99 };
             output[2] = new double[] { 0.99 };
             output[3] = new double[] { 0.01 };
+            
+            int count = 0;
+            int number = 0;
+            do
+            {
+                count++;
+                net.Init(2, 2, 1);
 
-            /*Console.WriteLine("Inputlayer");
-            foreach (var item in net.inputLayer.neurons)
-            {
-                foreach (var item2 in item.Input)
+                if (count > 50)
                 {
-                    Console.WriteLine("Weight: " + item2.Weight + " Value: " + item2.Input.GetOutput());
+                    count = 0;
+                    number++;
                 }
-            }
-            Console.WriteLine("Hiddenlayer");
-            foreach (var item in net.hiddenLayer.neurons)
-            {
-                foreach (var item2 in item.Input)
-                {
-                    Console.WriteLine("Weight: " + item2.Weight + " Value: " + item2.Input.GetOutput());
-                }
-            }
-            Console.WriteLine("Outputlayer");
-            foreach (var item in net.outputLayer.neurons)
-            {
-                foreach (var item2 in item.Input)
-                {
-                    Console.WriteLine("Weight: " + item2.Weight + " Value: " + item2.Input.GetOutput());
-                }
-            }*/
+                else
+                    net.Train(input, output, number, 15);
 
+                net.inputLayer.neurons[0].Output = low;
+                net.inputLayer.neurons[1].Output = low;
+
+                net.Pulse();
+
+                ll = net.outputLayer.neurons[0].Output;
+
+                net.inputLayer.neurons[0].Output = high;
+                net.inputLayer.neurons[1].Output = low;
+
+                net.Pulse();
+
+                hl = net.outputLayer.neurons[0].Output;
+
+                net.inputLayer.neurons[0].Output = low;
+                net.inputLayer.neurons[1].Output = high;
+
+                net.Pulse();
+
+                lh = net.outputLayer.neurons[0].Output;
+
+                net.inputLayer.neurons[0].Output = high;
+                net.inputLayer.neurons[1].Output = high;
+
+                net.Pulse();
+
+                hh = net.outputLayer.neurons[0].Output;
+
+            } while (hh > (mid + low) / 2
+                || lh < (mid + high) / 2
+                || hl < (mid + low) / 2
+                || ll > (mid + high) / 2);
+
+            PrintOut(0.01, 0.99);
+
+        }
+        private void PrintOut(double input1, double input2)
+        {
             bool result;
 
-            net.Train(input, output, 0.2, 1000);
-
-            double input1 = 0.99;
-            double input2 = 0.01;
             net.inputLayer.neurons[0].SetOutput(input1);
             net.inputLayer.neurons[1].SetOutput(input2);
 

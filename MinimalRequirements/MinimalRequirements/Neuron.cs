@@ -16,6 +16,8 @@ namespace MinimalRequirements
         public Neuron(double bias)
         {
             this.bias = bias;
+            delta = 0;
+            lastdelta = 0;
         }
 
         internal void Pulse(NeuralLayer neuralLayer)
