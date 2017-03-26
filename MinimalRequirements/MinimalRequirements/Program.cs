@@ -48,7 +48,7 @@ namespace MinimalRequirements
 
             bool result;
 
-            net.Train(input, output, 0.3, 110);
+            net.Train(input, output, 0.3, 300);
 
             double input1 = 0.99;
             double input2 = 0.01;

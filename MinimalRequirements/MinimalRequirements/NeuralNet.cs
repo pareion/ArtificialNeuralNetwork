@@ -12,7 +12,7 @@ namespace MinimalRequirements
         public NeuralLayer hiddenLayer;
         public NeuralLayer outputLayer;
 
-        
+
         public void Pulse()
         {
             lock (this)
@@ -82,7 +82,7 @@ namespace MinimalRequirements
             PreparePerceptionLayerForPulse(neuralNet, input);
             neuralNet.Pulse();
             CalculateErrors(neuralNet, expected);
-            AdjuestNet(neuralNet,learningrate);
+            AdjuestNet(neuralNet, learningrate, expected);
         }
 
         private void PreparePerceptionLayerForPulse(NeuralNet neuralNet, double[] input)
@@ -111,7 +111,7 @@ namespace MinimalRequirements
             }
         }
 
-        private void AdjuestNet(NeuralNet neuralNet, double learningrate)
+        private void AdjuestNet(NeuralNet neuralNet, double learningrate, double[] expected)
         {
             for (int i = 0; i < neuralNet.hiddenLayer.neurons.Count; i++)
             {
@@ -120,8 +120,13 @@ namespace MinimalRequirements
                 for (int i2 = 0; i2 < neuralNet.outputLayer.neurons.Count; i2++)
                 {
                     Neuron output = neuralNet.outputLayer.neurons[i2];
-                    output.Input[i].Weight += learningrate * output.error * node.Output;
-                    output.delta += learningrate * output.error * output.weight;
+                    double momentum = 0;
+                    for (int i3 = 0; i3 < expected.Count(); i3++)
+                    {
+                        momentum = (expected[i3] - output.Output);
+                    }
+                    output.Input[i].Weight += momentum * learningrate * output.error * node.Output;
+                    output.delta += momentum * learningrate * output.error * output.weight;
                 }
             }
 
@@ -132,36 +137,15 @@ namespace MinimalRequirements
                 for (int i2 = 0; i2 < neuralNet.hiddenLayer.neurons.Count; i2++)
                 {
                     Neuron output = neuralNet.hiddenLayer.neurons[i2];
-                    output.Input[i].Weight += learningrate * output.error * node.Output;
-                    output.delta += learningrate * output.error * output.weight;
+                    double momentum = 0;
+                    for (int i3 = 0; i3 < expected.Count(); i3++)
+                    {
+                        momentum = (expected[i3] - neuralNet.outputLayer.neurons[i3].Output);
+                    }
+                    output.Input[i].Weight +=  momentum * learningrate * output.error * node.Output;
+                    output.delta += momentum * learningrate * output.error * output.weight;
                 }
             }
-            /*
-            // adjust output layer weight
-            for (int i = 0; i < neuralNet.outputLayer.neurons.Count; i++)
-            {
-                Neuron output = neuralNet.outputLayer.neurons[i];
-                Neuron hidden = null;
-                for (int j = 0; j < neuralNet.hiddenLayer.neurons.Count; j++)
-                {
-                    hidden = neuralNet.hiddenLayer.neurons[i];
-                    output.delta += output.error * hidden.Output;
-                }
-                output.delta += output.error * output.weight;
-            }
-
-            // adjust hidden layer weight
-            for (int i = 0; i < neuralNet.hiddenLayer.neurons.Count; i++)
-            {
-                Neuron hidden = neuralNet.hiddenLayer.neurons[i];
-                Neuron input = null;
-                for (int j = 0; j < neuralNet.inputLayer.neurons.Count; j++)
-                {
-                    input = neuralNet.inputLayer.neurons[i];
-                    hidden.delta += hidden.error * input.Output;
-                }
-                hidden.delta += hidden.error * hidden.weight;
-            }*/
         }
 
         private void CalculateErrors(NeuralNet neuralNet, double[] expectedOutput)
