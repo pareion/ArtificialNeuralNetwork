@@ -28,8 +28,7 @@ namespace MinimalRequirements
             output[1] = new double[] { 0.99 };
             output[2] = new double[] { 0.99 };
             output[3] = new double[] { 0.01 };
-
-            seed = random.Next();
+            
             net.Init(seed, 2, 2, 1);
 
             net.Train(input, output, 0.3, 200);
