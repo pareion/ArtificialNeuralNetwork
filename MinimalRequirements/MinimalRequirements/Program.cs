@@ -18,25 +18,24 @@ namespace MinimalRequirements
             int seed = 0;
 
             double[][] input = new double[4][];
-            input[0] = new double[] { 0.99, 0.99 };
-            input[1] = new double[] { 0.01, 0.99 };
-            input[2] = new double[] { 0.99, 0.01 };
-            input[3] = new double[] { 0.01, 0.01 };
+            input[0] = new double[] { 1, 1 };
+            input[1] = new double[] { 0, 1 };
+            input[2] = new double[] { 1, 0 };
+            input[3] = new double[] { 0, 0 };
 
             double[][] output = new double[4][];
-            output[0] = new double[] { 0.01 };
-            output[1] = new double[] { 0.99 };
-            output[2] = new double[] { 0.99 };
-            output[3] = new double[] { 0.01 };
-            
-            net.Init(seed, 2, 2, 1);
+            output[0] = new double[] { 0 };
+            output[1] = new double[] { 1 };
+            output[2] = new double[] { 1 };
+            output[3] = new double[] { 0 };
 
-            net.Train(input, output, 0.3, 200);
-            Console.Clear();
-            bool t1 = PrintOut(0.01, 0.99);
-            bool t2 = PrintOut(0.99, 0.01);
-            bool t3 = PrintOut(0.01, 0.01);
-            bool t4 = PrintOut(0.99, 0.99);
+            net.Init(3, 2, 4, 1);
+            net.Train(input, output, 7, 8);
+
+            PrintOut(0, 1);
+            PrintOut(1, 0);
+            PrintOut(0, 0);
+            PrintOut(1, 1);
             
             Console.Read();
         }
