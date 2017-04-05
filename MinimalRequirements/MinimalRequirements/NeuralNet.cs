@@ -11,8 +11,8 @@ namespace MinimalRequirements
         public NeuralLayer inputLayer;
         public NeuralLayer hiddenLayer;
         public NeuralLayer outputLayer;
-
-
+        public double fitness;
+        public int seed;
         public void Pulse()
         {
             lock (this)
@@ -27,7 +27,13 @@ namespace MinimalRequirements
             inputLayer = new NeuralLayer();
             hiddenLayer = new NeuralLayer();
             outputLayer = new NeuralLayer();
-            Random rand = new Random(seed);
+            fitness = 100;
+            this.seed = seed;
+            Random rand = new Random(this.seed);
+            Random rand2 = new Random(this.seed);
+            Random rand3 = new Random(this.seed);
+            Random rand4 = new Random(this.seed);
+
             int i, j;
 
             for (i = 0; i < inputNeurons; i++)
@@ -37,14 +43,14 @@ namespace MinimalRequirements
                 hiddenLayer.neurons.Add(new Neuron(rand.NextDouble()));
 
             for (i = 0; i < outputNeurons; i++)
-                outputLayer.neurons.Add(new Neuron(rand.NextDouble()));
+                outputLayer.neurons.Add(new Neuron(rand2.NextDouble()));
 
             //Wire input together with the hidden layer
             for (i = 0; i < hiddenLayer.neurons.Count; i++)
             {
                 for (j = 0; j < inputLayer.neurons.Count; j++)
                 {
-                    hiddenLayer.neurons[i].Input.Add(new Link(inputLayer.neurons[j], rand.NextDouble()));
+                    hiddenLayer.neurons[i].Input.Add(new Link(inputLayer.neurons[j], rand3.NextDouble()));
                 }
             }
 
@@ -54,7 +60,7 @@ namespace MinimalRequirements
             {
                 for (j = 0; j < hiddenLayer.neurons.Count; j++)
                 {
-                    outputLayer.neurons[i].Input.Add(new Link(hiddenLayer.neurons[j], rand.NextDouble()));
+                    outputLayer.neurons[i].Input.Add(new Link(hiddenLayer.neurons[j], rand4.NextDouble()));
                 }
             }
         }
@@ -148,7 +154,7 @@ namespace MinimalRequirements
             }
         }
 
-        private void CalculateErrors(NeuralNet neuralNet, double[] expectedOutput)
+        public void CalculateErrors(NeuralNet neuralNet, double[] expectedOutput)
         {
             //Calculate outputlayer errors
             for (int i = 0; i < neuralNet.outputLayer.neurons.Count; i++)
